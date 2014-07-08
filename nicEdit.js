@@ -271,7 +271,8 @@ var nicEditorConfig = bkClass.extend({
 	iconsPath : '../nicEditorIcons.gif',
 	buttonList : ['save','bold','italic','underline','left','center','right','justify','ol','ul','fontSize','fontFamily','fontFormat','indent','outdent','image','upload','link','unlink','forecolor','bgcolor'],
 	iconList : {"xhtml":1,"bgcolor":2,"forecolor":3,"bold":4,"center":5,"hr":6,"indent":7,"italic":8,"justify":9,"left":10,"ol":11,"outdent":12,"removeformat":13,"right":14,"save":25,"strikethrough":16,"subscript":17,"superscript":18,"ul":19,"underline":20,"image":21,"link":22,"unlink":23,"close":24,"arrow":26,"upload":27},
-	initWithLineBreak: true
+	initWithLineBreak: true,
+	width: null
 });
 /* END CONFIG */
 
@@ -320,7 +321,13 @@ var nicEditor = bkClass.extend({
 
 	panelInstance : function(e,o) {
 		e = this.checkReplace($BK(e));
-		var panelElm = new bkElement('DIV').setStyle({width : (parseInt(e.getStyle('width')) || e.clientWidth)+'px'}).appendBefore(e);
+		var width;
+		if (this.options.width === null) {
+			width = (parseInt(e.getStyle('width')) || e.clientWidth) + 'px';
+		} else {
+			width = parseInt(this.options.width) + '%';
+		}
+		var panelElm = new bkElement('DIV').setStyle({width : width}).appendBefore(e);
 		this.setPanel(panelElm);
 		return this.addInstance(e,o);
 	},
@@ -415,18 +422,23 @@ var nicEditorInstance = bkClass.extend({
 		this.ne = nicEditor;
 		this.elm = this.e = e;
 		this.options = options || {};
-
-		newX = parseInt(e.getStyle('width')) || e.clientWidth;
+		var editorElemNewX;
+		if (this.options.width === null) {
+			newX = (parseInt(e.getStyle('width')) || e.clientWidth) + "px";
+			editorElemNewX = (newX - 8) + 'px';
+		} else {
+			editorElemNewX = newX = parseInt(this.options.width) + "%";
+		}
 		newY = parseInt(e.getStyle('height')) || e.clientHeight;
 		this.initialHeight = newY-8;
 
 		var isTextarea = (e.nodeName.toLowerCase() == "textarea");
 		if(isTextarea || this.options.hasPanel) {
 			var ie7s = (bkLib.isMSIE && !((typeof document.body.style.maxHeight != "undefined") && document.compatMode == "CSS1Compat"))
-			var s = {width: newX+'px', border : '1px solid #ccc', borderTop : 0, overflowY : 'auto', overflowX: 'hidden' };
+			var s = {width: newX, border : '1px solid #ccc', borderTop : 0, overflowY : 'auto', overflowX: 'hidden' };
 			s[(ie7s) ? 'height' : 'maxHeight'] = (this.ne.options.maxHeight) ? this.ne.options.maxHeight+'px' : null;
 			this.editorContain = new bkElement('DIV').setStyle(s).appendBefore(e);
-			var editorElm = new bkElement('DIV').setStyle({width : (newX-8)+'px', margin: '4px', minHeight : newY+'px'}).addClass('main').appendTo(this.editorContain);
+			var editorElm = new bkElement('DIV').setStyle({width : editorElemNewX, margin: '4px', minHeight : newY+'px'}).addClass('main').appendTo(this.editorContain);
 
 			e.setStyle({display : 'none'});
 
