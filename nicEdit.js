@@ -335,8 +335,8 @@ var nicEditor = bkClass.extend({
 	checkReplace : function(e) {
 		var r = nicEditors.findEditor(e);
 		if(r) {
-			r.removeInstance(e);
-			r.removePanel();
+                    r.ne.removeInstance(e);
+                    r.ne.removePanel();
 		}
 		return e;
 	},
